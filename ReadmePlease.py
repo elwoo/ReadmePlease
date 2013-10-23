@@ -11,23 +11,21 @@ class ReadmePleaseCommand(sublime_plugin.WindowCommand):
 
     variations = ["README.*", "readme.*", "Readme.*", "ReadMe.*"]
 
-    self.helps = []
+    self.helps = set()
 
     for spelling in variations:
         readmes = sublime.find_resources(spelling)
 
         for readme in readmes:
+            package = (readme.split('/'))
 
-            package = (str(readme).split('/'))
-            plength = (len(package))
+            if len(package) > 3:
+                continue
+            package_name = package[-2]
+            readme_name = package[-1]
+            self.helps.add((package_name, readme_name, readme))
 
-            # weeding out the readme files from package libraries.
-            if plength < 7:
-                package_name = package[plength - 2]
-                readme_name = package[plength - 1]
-                self.helps.append([package_name, readme_name, readme])
-
-
+    self.helps = list(self.helps)
     self.helps.sort()
     self.window.show_quick_panel(list(map(lambda x: [x[0], x[1]], self.helps)), self.onSelect)
 
